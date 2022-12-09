@@ -2,41 +2,40 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
-
 def load_data(messages_filepath, categories_filepath):
     """
-        Read 2 datasets then merge and return merged data.
+    load data from filepath.
+    Return merged data
     """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    df = messages.merge(categories, how='outer', on=['id'])
+    df = messages.merge(categories, how ='outer', on =['id'])
     return df
 
 
 def clean_data(df):
     """
-        Clean data: rename column, drop duplicate
+    Return cleaned dataframe
     """
     categories = df['categories'].str.split(';', expand=True)
-    row = categories.iloc[0]
-    #     print(row)
-    category_name = [r.split('-')[0] for r in row]
-    categories.columns = category_name
+    row = categories.head(1)
+    category_colnames =  row.applymap(lambda x: x[:-2]).iloc[0,:]
+    categories.columns = category_colnames
     for column in categories:
-        #         print(categories[column].str[-1])
-        categories[column] = categories[column].str[-1].astype(int)
-
-    df.drop(columns=['categories'], inplace=True)
+        categories[column] = categories[column].str[-1]
+        categories[column] = categories[column].astype(int)
+    categories['related'] = categories['related'].replace(to_replace=2, value=1)
+    df.drop(columns = ['categories'], inplace=True)
     df = df.join(categories)
     df.drop_duplicates(inplace=True)
-
     return df
 
-
 def save_data(df, database_filename):
-    """save model"""
+    """
+    Save the cleaned dataframe into a SQLite database.
+    """
     engine = create_engine(f'sqlite:///{database_filename}')
-    df.to_sql('LanNH7', engine, index=False, if_exists='replace')
+    df.to_sql('Project2', engine, index=False, if_exists='replace')
 
 
 def main():
@@ -50,12 +49,12 @@ def main():
 
         print('Cleaning data...')
         df = clean_data(df)
-
+        
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
         save_data(df, database_filepath)
-
+        
         print('Cleaned data saved to database!')
-
+    
     else:
         print('Please provide the filepaths of the messages and categories '\
               'datasets as the first and second argument respectively, as '\
