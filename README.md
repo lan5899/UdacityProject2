@@ -1,6 +1,10 @@
 # Disaster Response Pipeline Project
 
 ### Instructions:
+In order to increase my prospects and potential as a data scientist, I have studied and developed my data engineering abilities in this project. In order to create a model for an API that categorizes disaster messages, I'll use these abilities in this project to evaluate disaster data from Appen.
+
+
+You developed a machine learning pipeline to classify these events so I could communicate the information to the proper disaster relief organization.
 1. Run the following commands in the project's root directory to set up your database and model.
 
     - To run ETL pipeline that cleans data and stores in database
